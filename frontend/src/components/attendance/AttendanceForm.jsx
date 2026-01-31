@@ -1,8 +1,19 @@
 import { useEffect, useState } from "react";
 import { getEmployees, addAttendance } from "../../services/api";
+import toast from "react-hot-toast";
+
+// react-icons
+import { FaUserTie, FaCalendarAlt, FaCheckCircle } from "react-icons/fa";
+
+// common components
+import Button from "../common/Button";
+import Input from "../common/Input";
+import Loader from "../common/Loader";
 
 export default function AttendanceForm() {
   const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     employeeId: "",
     date: "",
@@ -10,37 +21,121 @@ export default function AttendanceForm() {
   });
 
   useEffect(() => {
-    getEmployees().then(res => setEmployees(res.data));
+    getEmployees()
+      .then((res) => setEmployees(res.data))
+      .catch(() => toast.error("Failed to load employees"));
   }, []);
 
+  const handleSubmit = async () => {
+    if (!form.employeeId || !form.date) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const toastId = toast.loading("Marking attendance...");
+
+      await addAttendance(form);
+
+      toast.success("Attendance marked successfully", { id: toastId });
+
+      setForm({
+        employeeId: "",
+        date: "",
+        status: "Present",
+      });
+    } catch (err) {
+      toast.error("Failed to mark attendance");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="bg-white p-6 rounded shadow mb-6">
-      <h2 className="text-lg font-semibold mb-4">Mark Attendance</h2>
-      <div className="grid grid-cols-3 gap-4">
-        <select className="border p-2"
-          onChange={e => setForm({...form, employeeId: e.target.value})}>
-          <option>Select Employee</option>
-          {employees.map(e => (
-            <option key={e.employee_id} value={e.employee_id}>
-              {e.full_name}
-            </option>
-          ))}
-        </select>
-
-        <input type="date" className="border p-2"
-          onChange={e => setForm({...form, date: e.target.value})} />
-
-        <select className="border p-2"
-          onChange={e => setForm({...form, status: e.target.value})}>
-          <option>Present</option>
-          <option>Absent</option>
-        </select>
-      </div>
-
-      <button onClick={() => addAttendance(form)}
-        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
+    <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
+      <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center justify-center gap-2">
+        <FaCheckCircle className="text-blue-600" />
         Mark Attendance
-      </button>
+      </h2>
+
+      {/* Loader while employees loading */}
+      {employees.length === 0 ? (
+        <Loader text="Loading employees..." />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Employee */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Employee
+            </label>
+            <div className="relative">
+              <FaUserTie className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <select
+                value={form.employeeId}
+                onChange={(e) =>
+                  setForm({ ...form, employeeId: e.target.value })
+                }
+                className="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option value="">Select Employee</option>
+                {employees.map((e) => (
+                  <option key={e.employee_id} value={e.employee_id}>
+                    {e.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Date */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Date
+            </label>
+            <div className="relative">
+              <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Input
+                type="date"
+                value={form.date}
+                onChange={(e) =>
+                  setForm({ ...form, date: e.target.value })
+                }
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Status
+            </label>
+            <select
+              value={form.status}
+              onChange={(e) =>
+                setForm({ ...form, status: e.target.value })
+              }
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+            >
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Button */}
+      <div className="flex justify-center mt-6">
+        <Button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105"
+        >
+          <FaCheckCircle />
+          {loading ? "Saving..." : "Mark Attendance"}
+        </Button>
+      </div>
     </div>
   );
 }

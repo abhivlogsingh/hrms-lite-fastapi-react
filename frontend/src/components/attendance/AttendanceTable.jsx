@@ -1,29 +1,44 @@
-export default function AttendanceTable({ records }) {
+// common reusable table
+import Table from "../common/Table";
+
+export default function AttendanceTable({ records, error, loading }) {
+  const columns = [
+    { key: "employee_name", label: "Name" },
+    { key: "date", label: "Date" },
+    { key: "statusBadge", label: "Status" },
+  ];
+
+  // Status ko badge me convert kar rahe hain
+  const tableData = (records || []).map((r) => ({
+    ...r,
+    statusBadge: (
+      <span
+        className={`px-3 py-1 rounded-full text-xs font-medium ${
+          r.status === "Present"
+            ? "bg-green-100 text-green-700"
+            : "bg-red-100 text-red-700"
+        }`}
+      >
+        {r.status}
+      </span>
+    ),
+  }));
+
+  // ❌ Error UI
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-600">
+        Failed to load attendance records
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded shadow">
-      <h2 className="text-lg font-semibold p-4">Attendance Records</h2>
-      <table className="w-full">
-        <thead className="bg-gray-100">
-          <tr>
-            <th>Name</th><th>Date</th><th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {records.map((r, i) => (
-            <tr key={i} className="text-center border-t">
-              <td>{r.employee_name}</td>
-              <td>{r.date}</td>
-              <td>
-                <span className={`px-2 py-1 rounded text-white ${
-                  r.status === "Present" ? "bg-green-500" : "bg-red-500"
-                }`}>
-                  {r.status}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table
+      columns={columns}
+      data={tableData}
+      searchableKey="employee_name"
+      loading={loading}
+    />
   );
 }

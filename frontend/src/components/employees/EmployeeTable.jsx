@@ -1,31 +1,50 @@
+import toast from "react-hot-toast";
 import { deleteEmployee } from "../../services/api";
 
-export default function EmployeeTable({ employees, refresh }) {
+// common reusable table
+import Table from "../common/Table";
+
+export default function EmployeeTable({ employees, refresh, loading, error }) {
+  const columns = [
+    { key: "employee_id", label: "ID" },
+    { key: "full_name", label: "Name" },
+    { key: "email", label: "Email" },
+    { key: "department", label: "Department" },
+  ];
+
+  const handleDelete = async (row) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this employee?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const toastId = toast.loading("Deleting employee...");
+      await deleteEmployee(row.employee_id);
+      toast.success("Employee deleted successfully", { id: toastId });
+      refresh();
+    } catch (err) {
+      toast.error("Failed to delete employee");
+    }
+  };
+
+  // ❌ Error UI
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-600">
+        Failed to load employees
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded shadow">
-      <h2 className="text-lg font-semibold p-4">Employee List</h2>
-      <table className="w-full">
-        <thead className="bg-gray-100">
-          <tr>
-            <th>ID</th><th>Name</th><th>Email</th><th>Dept</th><th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map(e => (
-            <tr key={e.employee_id} className="text-center border-t">
-              <td>{e.employee_id}</td>
-              <td>{e.full_name}</td>
-              <td>{e.email}</td>
-              <td>{e.department}</td>
-              <td>
-                <button
-                  onClick={() => { deleteEmployee(e.employee_id); refresh(); }}
-                  className="text-red-600">Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table
+      columns={columns}
+      data={employees}
+      searchableKey="full_name"
+      onDelete={handleDelete}
+      loading={loading}
+    />
   );
 }

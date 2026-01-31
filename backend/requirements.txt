@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 pymongo
+email-validator
 sqlalchemy
 psycopg2
 python-dotenv

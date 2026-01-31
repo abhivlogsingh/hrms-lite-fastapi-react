@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+pymongo
 sqlalchemy
 psycopg2
 python-dotenv

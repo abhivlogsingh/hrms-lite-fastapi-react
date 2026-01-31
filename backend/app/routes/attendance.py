@@ -37,7 +37,18 @@ def mark_attendance(att: AttendanceCreate):
 @router.get("/")
 def get_attendance():
     records = list(attendance_collection.find({}, {"_id": 0}))
-    return records
+
+    result = []
+    for rec in records:
+        emp = employees_collection.find_one(
+            {"employee_id": rec["employee_id"]},
+            {"_id": 0, "full_name": 1}
+        )
+
+        rec["full_name"] = emp["full_name"] if emp else None
+        result.append(rec)
+
+    return result
 
 
 @router.get("/{employee_id}")
@@ -48,4 +59,15 @@ def get_attendance_by_employee(employee_id: str):
             {"_id": 0}
         )
     )
+
+    emp = employees_collection.find_one(
+        {"employee_id": employee_id},
+        {"_id": 0, "full_name": 1}
+    )
+
+    full_name = emp["full_name"] if emp else None
+
+    for rec in records:
+        rec["full_name"] = full_name
+
     return records

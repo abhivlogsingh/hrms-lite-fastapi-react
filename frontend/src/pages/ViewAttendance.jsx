@@ -4,7 +4,6 @@ import { getEmployees, getAttendance } from "../services/api";
 import AttendanceTable from "../components/attendance/AttendanceTable";
 import Loader from "../components/common/Loader";
 import Button from "../components/common/Button";
-import Input from "../components/common/Input";
 
 import { FaUserTie, FaFilter } from "react-icons/fa";
 
@@ -17,7 +16,6 @@ export default function ViewAttendance() {
   const [loadingRecords, setLoadingRecords] = useState(false);
   const [error, setError] = useState(false);
 
-  // Load employees for dropdown
   useEffect(() => {
     const loadEmployees = async () => {
       try {
@@ -49,10 +47,10 @@ export default function ViewAttendance() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto px-4 space-y-8">
       {/* Filter Card */}
-      <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-        <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+      <div className="bg-white/80 backdrop-blur rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
           <FaFilter className="text-blue-600" />
           View Attendance
         </h2>
@@ -60,39 +58,44 @@ export default function ViewAttendance() {
         {loadingEmployees ? (
           <Loader text="Loading employees..." />
         ) : (
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-4 items-end">
             {/* Employee Select */}
-            <div className="relative w-full">
-              <FaUserTie className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <select
-                value={selected}
-                onChange={(e) => setSelected(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-              >
-                <option value="">All Employees</option>
-                {employees.map((e) => (
-                  <option key={e.employee_id} value={e.employee_id}>
-                    {e.full_name}
-                  </option>
-                ))}
-              </select>
+            <div className="w-full">
+              <label className="text-sm font-medium text-gray-600 mb-1 block">
+                Select Employee
+              </label>
+              <div className="relative">
+                <FaUserTie className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <select
+                  value={selected}
+                  onChange={(e) => setSelected(e.target.value)}
+                  className="w-full appearance-none border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+                >
+                  <option value="">All Employees</option>
+                  {employees.map((e) => (
+                    <option key={e.employee_id} value={e.employee_id}>
+                      {e.full_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Button */}
             <Button
               onClick={loadAttendance}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600"
+              className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md transition"
             >
               <FaFilter />
-              View Attendance
+              View
             </Button>
           </div>
         )}
 
-        {/* Error UI */}
+        {/* Error */}
         {error && (
-          <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4 text-red-600">
-            Failed to load attendance data
+          <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm">
+            ❌ Failed to load attendance data. Please try again.
           </div>
         )}
       </div>
@@ -100,6 +103,10 @@ export default function ViewAttendance() {
       {/* Table */}
       {loadingRecords ? (
         <Loader text="Loading attendance records..." />
+      ) : records.length === 0 ? (
+        <div className="bg-white rounded-xl shadow p-6 text-center text-gray-500">
+          📭 No attendance records found
+        </div>
       ) : (
         <AttendanceTable records={records} error={error} />
       )}

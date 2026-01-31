@@ -14,17 +14,31 @@ export default function App() {
     <>
       {/* ✅ Toaster mount */}
       <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-            fontSize: "14px",
-          },
-        }}
-      />
+  position="top-right"
+  toastOptions={{
+    duration: 3000,
+    style: {
+      borderRadius: "12px",
+      background: "#ffffff",
+      color: "#333",
+      fontSize: "14px",
+      padding: "12px 16px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+      border: "1px solid #eee",
+    },
+    success: {
+      style: {
+        border: "1px solid #22c55e",
+      },
+    },
+    error: {
+      style: {
+        border: "1px solid #ef4444",
+      },
+    },
+  }}
+/>
+
 
       <PageWrapper>
         <Routes>

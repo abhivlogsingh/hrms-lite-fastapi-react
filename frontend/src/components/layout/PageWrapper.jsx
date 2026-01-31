@@ -6,20 +6,20 @@ export default function PageWrapper({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Sidebar (desktop) */}
-      <div className="hidden md:block">
+      <aside className="hidden md:block">
         <Sidebar />
-      </div>
+      </aside>
 
       {/* Sidebar (mobile overlay) */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
-          <div className="bg-white w-64 shadow-lg">
+          <div className="bg-white w-64 shadow-2xl animate-slideIn">
             <Sidebar />
           </div>
           <div
-            className="flex-1 bg-black bg-opacity-30"
+            className="flex-1 bg-black/30 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
         </div>
@@ -31,7 +31,7 @@ export default function PageWrapper({ children }) {
         <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

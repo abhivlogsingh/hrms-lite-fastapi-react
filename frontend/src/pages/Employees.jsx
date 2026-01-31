@@ -8,25 +8,30 @@ import Loader from "../components/common/Loader";
 export default function Employees() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
 
   const loadEmployees = async () => {
-  try {
-    setLoading(true);
-    const res = await getEmployees();
-    setEmployees(res.data);
-    setError(null);
-  } catch (err) {
-    console.error(err);
+    try {
+      setLoading(true);
+      const res = await getEmployees();
 
-    setError(
-      err.response?.data?.message || "Failed to load employees"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      console.log("EMPLOYEES API DATA:", res.data); // 👈 debug
 
+      // ✅ ensure array
+      if (Array.isArray(res.data)) {
+        setEmployees(res.data);
+        setError(null);
+      } else {
+        setEmployees([]);
+        setError("Invalid response format");
+      }
+    } catch (err) {
+      console.error("EMPLOYEES API ERROR:", err);
+      setError(err.response?.data?.detail || "Failed to load employees");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadEmployees();
@@ -34,10 +39,8 @@ export default function Employees() {
 
   return (
     <div className="space-y-6">
-      {/* Form */}
       <EmployeeForm refresh={loadEmployees} />
 
-      {/* Table */}
       {loading ? (
         <Loader text="Loading employees..." />
       ) : (

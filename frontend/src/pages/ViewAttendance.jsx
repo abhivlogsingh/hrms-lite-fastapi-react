@@ -14,48 +14,57 @@ export default function ViewAttendance() {
 
   const [loadingEmployees, setLoadingEmployees] = useState(true);
   const [loadingRecords, setLoadingRecords] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-  const loadEmployees = async () => {
+    const loadEmployees = async () => {
+      try {
+        setLoadingEmployees(true);
+        const res = await getEmployees();
+
+        console.log("EMPLOYEES:", res.data); // debug
+
+        if (Array.isArray(res.data)) {
+          setEmployees(res.data);
+          setError(null);
+        } else {
+          setEmployees([]);
+          setError("Invalid employees response");
+        }
+      } catch (err) {
+        console.error("EMPLOYEES ERROR:", err);
+        setError(err.response?.data?.detail || "Failed to load employees");
+      } finally {
+        setLoadingEmployees(false);
+      }
+    };
+
+    loadEmployees();
+  }, []);
+
+  const loadAttendance = async () => {
     try {
-      setLoadingEmployees(true);
+      setLoadingRecords(true);
+      const res = await getAttendance(selected);
 
-      const res = await getEmployees();
-      setEmployees(res.data);
-      setError(null);
+      console.log("ATTENDANCE:", res.data); // debug
+
+      if (Array.isArray(res.data)) {
+        setRecords(res.data);
+        setError(null);
+      } else {
+        setRecords([]);
+        setError("Invalid attendance response");
+      }
     } catch (err) {
-      console.error(err);
-
+      console.error("ATTENDANCE ERROR:", err);
       setError(
-        err.response?.data?.message || "Failed to load employees"
+        err.response?.data?.detail || "Failed to load attendance records"
       );
     } finally {
-      setLoadingEmployees(false);
+      setLoadingRecords(false);
     }
   };
-
-  loadEmployees();
-}, []);
-
-const loadAttendance = async () => {
-  try {
-    setLoadingRecords(true);
-
-    const res = await getAttendance(selected);
-    setRecords(res.data);
-    setError(null);
-  } catch (err) {
-    console.error(err);
-
-    setError(
-      err.response?.data?.message || "Failed to load attendance records"
-    );
-  } finally {
-    setLoadingRecords(false);
-  }
-};
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 space-y-8">
@@ -103,10 +112,9 @@ const loadAttendance = async () => {
           </div>
         )}
 
-        {/* Error */}
         {error && (
           <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm">
-            ❌ Failed to load attendance data. Please try again.
+            ❌ {error}
           </div>
         )}
       </div>

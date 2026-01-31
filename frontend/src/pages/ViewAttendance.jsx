@@ -17,34 +17,45 @@ export default function ViewAttendance() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const loadEmployees = async () => {
-      try {
-        setLoadingEmployees(true);
-        const res = await getEmployees();
-        setEmployees(res.data);
-        setError(false);
-      } catch (err) {
-        setError(true);
-      } finally {
-        setLoadingEmployees(false);
-      }
-    };
-
-    loadEmployees();
-  }, []);
-
-  const loadAttendance = async () => {
+  const loadEmployees = async () => {
     try {
-      setLoadingRecords(true);
-      const res = await getAttendance(selected);
-      setRecords(res.data);
-      setError(false);
+      setLoadingEmployees(true);
+
+      const res = await getEmployees();
+      setEmployees(res.data);
+      setError(null);
     } catch (err) {
-      setError(true);
+      console.error(err);
+
+      setError(
+        err.response?.data?.message || "Failed to load employees"
+      );
     } finally {
-      setLoadingRecords(false);
+      setLoadingEmployees(false);
     }
   };
+
+  loadEmployees();
+}, []);
+
+const loadAttendance = async () => {
+  try {
+    setLoadingRecords(true);
+
+    const res = await getAttendance(selected);
+    setRecords(res.data);
+    setError(null);
+  } catch (err) {
+    console.error(err);
+
+    setError(
+      err.response?.data?.message || "Failed to load attendance records"
+    );
+  } finally {
+    setLoadingRecords(false);
+  }
+};
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 space-y-8">

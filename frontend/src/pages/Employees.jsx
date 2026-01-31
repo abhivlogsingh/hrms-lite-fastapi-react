@@ -11,17 +11,22 @@ export default function Employees() {
   const [error, setError] = useState(false);
 
   const loadEmployees = async () => {
-    try {
-      setLoading(true);
-      const res = await getEmployees();
-      setEmployees(res.data);
-      setError(false);
-    } catch (err) {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const res = await getEmployees();
+    setEmployees(res.data);
+    setError(null);
+  } catch (err) {
+    console.error(err);
+
+    setError(
+      err.response?.data?.message || "Failed to load employees"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     loadEmployees();

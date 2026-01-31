@@ -18,24 +18,33 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const empRes = await getEmployees();
-        const attRes = await getAttendance();
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
-        setEmployees(empRes.data);
-        setAttendance(attRes.data);
-      } catch (err) {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const [empRes, attRes] = await Promise.all([
+        getEmployees(),
+        getAttendance(),
+      ]);
 
-    fetchData();
-  }, []);
+      setEmployees(empRes.data);
+      setAttendance(attRes.data);
+      setError(null);
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err.response?.data?.message || "Failed to load dashboard data"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
+
 
   // ⏳ Loading UI
   if (loading) {

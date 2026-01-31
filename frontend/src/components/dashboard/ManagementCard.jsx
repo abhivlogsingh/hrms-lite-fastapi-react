@@ -12,7 +12,7 @@ export default function ManagementCard({ title, description, icon: Icon, to }) {
       "
     >
       <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-        <Icon size={22} />
+        {Icon && <Icon size={22} />}
       </div>
 
       <div>

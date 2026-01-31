@@ -10,7 +10,7 @@ import Button from "../common/Button";
 import Input from "../common/Input";
 import Loader from "../common/Loader";
 
-export default function AttendanceForm() {
+export default function AttendanceForm({ refresh }) {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -26,31 +26,44 @@ export default function AttendanceForm() {
       .catch(() => toast.error("Failed to load employees"));
   }, []);
 
-  const handleSubmit = async () => {
-    if (!form.employeeId || !form.date) {
-      toast.error("Please fill all fields");
-      return;
-    }
+const handleSubmit = async () => {
+  if (!form.employeeId || !form.date) {
+    toast.error("Please fill all fields");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      const toastId = toast.loading("Marking attendance...");
+  const toastId = toast.loading("Marking attendance...");
 
-      await addAttendance(form);
+  try {
+    setLoading(true);
 
-      toast.success("Attendance marked successfully", { id: toastId });
+    await addAttendance({
+      employee_id: form.employeeId,
+      date: form.date,
+      status: form.status,
+    });
 
-      setForm({
-        employeeId: "",
-        date: "",
-        status: "Present",
-      });
-    } catch (err) {
-      toast.error("Failed to mark attendance");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("Attendance marked successfully", { id: toastId });
+    
+    await refresh();
+
+    setForm({
+      employeeId: "",
+      date: "",
+      status: "Present",
+    });
+  } catch (err) {
+    console.error(err);
+
+    toast.error(
+      err.response?.data?.detail || "Failed to mark attendance",
+      { id: toastId }
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8">

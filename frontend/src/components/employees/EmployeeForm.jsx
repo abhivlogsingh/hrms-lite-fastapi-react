@@ -41,8 +41,8 @@ export default function EmployeeForm({ refresh }) {
         department: "",
       });
     } catch (err) {
-      toast.error("Failed to add employee");
-    } finally {
+  toast.error(err.response?.data?.message || "Failed to add employee");
+} finally {
       setLoading(false);
     }
   };

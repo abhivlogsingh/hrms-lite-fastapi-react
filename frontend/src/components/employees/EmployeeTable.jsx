@@ -12,22 +12,30 @@ export default function EmployeeTable({ employees, refresh, loading, error }) {
     { key: "department", label: "Department" },
   ];
 
-  const handleDelete = async (row) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this employee?"
+const handleDelete = async (row) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this employee?"
+  );
+
+  if (!confirmDelete) return;
+
+  const toastId = toast.loading("Deleting employee...");
+
+  try {
+    await deleteEmployee(row.employee_id);
+
+    toast.success("Employee deleted successfully", { id: toastId });
+    refresh();
+  } catch (err) {
+    console.error(err);
+
+    toast.error(
+      err.response?.data?.message || "Failed to delete employee",
+      { id: toastId }
     );
+  }
+};
 
-    if (!confirmDelete) return;
-
-    try {
-      const toastId = toast.loading("Deleting employee...");
-      await deleteEmployee(row.employee_id);
-      toast.success("Employee deleted successfully", { id: toastId });
-      refresh();
-    } catch (err) {
-      toast.error("Failed to delete employee");
-    }
-  };
 
   // ❌ Error UI
   if (error) {

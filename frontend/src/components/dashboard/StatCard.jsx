@@ -1,10 +1,8 @@
 import { FaChartBar } from "react-icons/fa";
 
-export default function StatCard({
-  title,
-  value,
-  icon: Icon = FaChartBar,
-}) {
+export default function StatCard({ title, value, icon }) {
+  const Icon = icon || FaChartBar;
+
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex items-center justify-between">
       {/* Left side text */}
@@ -15,7 +13,7 @@ export default function StatCard({
 
       {/* Right side icon */}
       <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600">
-        <Icon size={22} />
+        {Icon && <Icon size={22} />}
       </div>
     </div>
   );

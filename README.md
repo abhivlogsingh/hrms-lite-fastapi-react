@@ -1,2 +1,12 @@
-# hrms-lite-fastapi-react
-A lightweight HRMS web application built using FastAPI and React. It supports employee management and daily attendance tracking with a clean and simple admin interface.
+HRMS Lite - Full Stack App
+
+
+Backend: FastAPI
+Frontend: React
+Database: MongoDB
+
+
+Features:
+- Employee Management
+- Attendance Management
+- View Attendance by Employee

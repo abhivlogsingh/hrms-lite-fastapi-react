@@ -3,7 +3,7 @@ import Table from "../common/Table";
 
 export default function AttendanceTable({ records, error, loading }) {
   const columns = [
-    { key: "employee_name", label: "Name" },
+    { key: "full_name", label: "Name" },
     { key: "date", label: "Date" },
     { key: "statusBadge", label: "Status" },
   ];
